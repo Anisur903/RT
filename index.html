@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewind Tracker</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f9fc;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #34495e;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .clock {
+      text-align: center;
+      font-size: 30px;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #ecf0f1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #34495e;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      display: block;
+      color: #2c3e50;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .options label {
+      display: flex;
+      align-items: center;
+      background-color: #f0f3f4;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 15px;
+    }
+    .options label:hover {
+      background-color: #bdc3c7;
+    }
+    input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    .rating label {
+      margin-right: 10px;
+    }
+    .rating input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 25px;
+      background: #3498db;
+      border-radius: 5px;
+      outline: none;
+      transition: background 0.3s ease;
+    }
+    .rating input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      background-color: #2c3e50;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: background-color 0.3s ease;
+    }
+    .rating input[type="range"]::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      background-color: #2c3e50;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+    .submit-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #2c3e50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .submit-btn:hover {
+      background-color: #1a3d5d;
+    }
+    .record-list {
+      margin-top: 20px;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+    }
+    .record-item {
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #ecf0f1;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Rewind Tracker</h1>
+
+  <div class="container">
+    <div class="clock" id="clock">00:00:00</div>
+
+    <form id="rewindForm">
+      <div class="form-group">
+        <label for="rewindOptions">How did you rewind? (Select multiple options)</label>
+        <div class="options">
+          <label><input type="checkbox" name="rewindOptions" value="Deep Breathing"> Deep Breathing</label>
+          <label><input type="checkbox" name="rewindOptions" value="Mindful Breaks"> Mindful Breaks</label>
+          <label><input type="checkbox" name="rewindOptions" value="Progressive Muscle Relaxation"> Progressive Muscle Relaxation (PMR)</label>
+          <label><input type="checkbox" name="rewindOptions" value="Quick Stretching"> Quick Stretching</label>
+          <label><input type="checkbox" name="rewindOptions" value="Visualization"> Visualization</label>
+          <label><input type="checkbox" name="rewindOptions" value="Healthy Snacks"> Hydrate and Eat Healthy Snacks</label>
+          <label><input type="checkbox" name="rewindOptions" value="Pomodoro Technique"> Pomodoro Technique</label>
+          <label><input type="checkbox" name="rewindOptions" value="Aromatherapy"> Aromatherapy or Essential Oils</label>
+        </div>
+      </div>
+
+      <div class="form-group rating">
+        <label>Rate this Rewind Session (1 to 10):</label>
+        <input type="range" id="rewindRating" name="rating" min="1" max="10" step="1" value="5">
+      </div>
+
+      <button type="button" class="submit-btn" onclick="saveRecord()">Submit</button>
+    </form>
+
+    <div class="record-list" id="recordList">
+      <h2>Your Rewind Sessions</h2>
+    </div>
+  </div>
+
+  <script>
+    // Function to update clock
+    function updateClock() {
+      const clockElement = document.getElementById('clock');
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+
+    setInterval(updateClock, 1000);
+
+    function saveRecord() {
+      const form = document.getElementById('rewindForm');
+      const recordList = document.getElementById('recordList');
+
+      const rewindOptions = Array.from(form.querySelectorAll('input[name="rewindOptions"]:checked')).map(opt => opt.value);
+      const rating = form.querySelector('input[name="rating"]').value;
+      const now = new Date().toLocaleTimeString();
+
+      if (rewindOptions.length > 0 && rating) {
+        const recordItem = document.createElement('div');
+        recordItem.classList.add('record-item');
+        recordItem.innerHTML = `<strong>Time:</strong> ${now} <br> <strong>Rewind Options:</strong> ${rewindOptions.join(', ')}<br><strong>Rating:</strong> ${rating}`;
+        recordList.appendChild(recordItem);
+      } else {
+        alert("Please select at least one rewind option and rate your session.");
+      }
+
+      form.reset();
+    }
+  </script>
+
+</body>
+</html>
